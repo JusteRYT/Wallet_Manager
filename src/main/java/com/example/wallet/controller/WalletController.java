@@ -55,7 +55,7 @@ public class WalletController {
             String operationType = (String) request.get("operationType");
             double amount = Double.parseDouble(request.get("amount").toString());
 
-            walletService.perfomOperation(walletId, operationType, amount);
+            walletService.performOperation(walletId, operationType, amount);
 
             return ResponseEntity.ok(Map.of("walletId", walletId, "operation", operationType, "amount", amount));
         } catch (IllegalArgumentException e) {

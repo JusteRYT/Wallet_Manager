@@ -16,6 +16,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Тестовый класс для контроллера кошельков (WalletController).
+ * Проверяет работу HTTP-эндпоинтов для получения баланса и выполнения операций.
+ */
 @WebMvcTest(WalletController.class)
 class WalletControllerTest {
 
@@ -28,6 +32,10 @@ class WalletControllerTest {
     @MockBean
     private WalletRepository walletRepository;
 
+    /**
+     * Тестирует получение баланса кошелька, если кошелёк существует.
+     * Проверяет, что возвращается правильный баланс.
+     */
     @Test
     void getBalance_ShouldReturnBalance_WhenWalletExists() throws Exception {
 
@@ -41,6 +49,10 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.balance").value(balance));
     }
 
+    /**
+     * Тестирует получение баланса кошелька, если кошелёк не найден.
+     * Ожидается ответ с кодом 404 и сообщением об ошибке.
+     */
     @Test
     void getBalance_ShouldReturnBalance_WhenWalletDoesNotExist() throws Exception {
 
@@ -51,6 +63,10 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.error").value("Wallet not found"));
     }
 
+    /**
+     * Тестирует успешное выполнение операции, если входные данные корректны.
+     * Проверяется, что ответ содержит данные о кошельке и операции.
+     */
     @Test
     void performOperation_ShouldReturnSuccess_WhenOperationValid() throws Exception {
         UUID walletId = UUID.randomUUID();
@@ -76,6 +92,10 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.amount").value(amount));
     }
 
+    /**
+     * Тестирует ситуацию с некорректными входными данными.
+     * Проверяется, что возвращается ошибка с кодом 400.
+     */
     @Test
     void performOperation_ShouldReturnError_WhenInputInvalid() throws Exception {
         String invalidRequestBody = """

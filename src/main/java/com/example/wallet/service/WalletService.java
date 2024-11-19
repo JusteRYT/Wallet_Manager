@@ -35,21 +35,27 @@ public class WalletService {
     /**
      * Выполняет операцию изменения баланса кошелька.
      *
-     * @param walletId идентификатор кошелька
+     * @param walletId      идентификатор кошелька
      * @param operationType тип операции: DEPOSIT или WITHDRAW
-     * @param amount сумма операции
+     * @param amount        сумма операции
      * @throws IllegalArgumentException если кошелек не найден или недостаточно средств
      */
-    public void perfomOperation(UUID walletId, String operationType, double amount) {
+    public void performOperation(UUID walletId, String operationType, double amount) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
 
-        if("DEPOSIT".equalsIgnoreCase(operationType)) {
-            wallet.setBalance(wallet.getBalance() + amount);
-        } else if("WITHDRAW".equalsIgnoreCase(operationType)) {
-            wallet.setBalance(wallet.getBalance() - amount);
-        } else {
-            throw new IllegalArgumentException("Invalid operation type");
+        switch (operationType) {
+            case "WITHDRAW":
+                if (wallet.getBalance() < amount) {
+                    throw new IllegalArgumentException("Not enough balance");
+                }
+                wallet.setBalance(wallet.getBalance() - amount);
+                break;
+            case "DEPOSIT":
+                wallet.setBalance(wallet.getBalance() + amount);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid operation type");
         }
 
         walletRepository.save(wallet);

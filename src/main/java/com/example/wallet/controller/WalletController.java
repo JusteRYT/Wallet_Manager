@@ -1,5 +1,7 @@
 package com.example.wallet.controller;
 
+import com.example.wallet.model.Wallet;
+import com.example.wallet.repository.WalletRepository;
 import com.example.wallet.service.WalletService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +19,11 @@ import java.util.UUID;
 public class WalletController {
 
     private final WalletService walletService;
+    private final WalletRepository walletRepository;
 
-    public WalletController(WalletService walletService) {
+    public WalletController(WalletService walletService, WalletRepository walletRepository) {
         this.walletService = walletService;
+        this.walletRepository = walletRepository;
     }
 
     /**
@@ -30,10 +34,10 @@ public class WalletController {
      */
     @GetMapping("/{walletId}")
     public ResponseEntity<Map<String, Object>> getBalance(@PathVariable UUID walletId) {
-        try{
+        try {
             double balance = walletService.getBalance(walletId);
             return ResponseEntity.ok(Map.of("walletId", walletId, "balance", balance));
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
     }
@@ -54,13 +58,10 @@ public class WalletController {
             walletService.perfomOperation(walletId, operationType, amount);
 
             return ResponseEntity.ok(Map.of("walletId", walletId, "operation", operationType, "amount", amount));
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
-
-
-
 }

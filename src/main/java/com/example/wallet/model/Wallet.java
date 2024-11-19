@@ -12,6 +12,11 @@ import java.util.UUID;
 @Table(name = "wallet")
 public class Wallet {
 
+    public Wallet(UUID uuid, double balance) {
+        this.id = uuid;
+        this.balance = balance;
+    }
+
     /**
      * Уникальный идентификатор кошелька.
      */
@@ -24,6 +29,10 @@ public class Wallet {
      */
     @Column(nullable = false)
     private double balance;
+
+    public Wallet() {
+
+    }
 
     public UUID getId() {
         return id;

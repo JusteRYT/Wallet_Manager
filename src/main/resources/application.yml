@@ -4,6 +4,12 @@ spring:
     username: wallet_user
     password: wallet_password
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 100
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: none

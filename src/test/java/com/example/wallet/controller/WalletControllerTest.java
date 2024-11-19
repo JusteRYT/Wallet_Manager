@@ -57,7 +57,7 @@ class WalletControllerTest {
         String operationType = "DEPOSIT";
         double amount = 1000.0;
 
-        Mockito.doNothing().when(walletService).perfomOperation(walletId, operationType, amount);
+        Mockito.doNothing().when(walletService).performOperation(walletId, operationType, amount);
 
         String requestBody = String.format("""
                 {

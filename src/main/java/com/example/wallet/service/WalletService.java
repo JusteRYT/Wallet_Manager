@@ -2,10 +2,13 @@ package com.example.wallet.service;
 
 import com.example.wallet.model.Wallet;
 import com.example.wallet.repository.WalletRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Сервис для управления кошельками.
@@ -20,6 +23,19 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
+     /**
+     * Выполняет асинхронную операцию изменения баланса кошелька.
+     *
+     * @param walletId      идентификатор кошелька
+     * @param operationType тип операции: DEPOSIT или WITHDRAW
+     * @param amount        сумма операции
+     * @return CompletableFuture<Void>
+     */
+    @Async
+    public CompletableFuture<Void> performOperationAsync(UUID walletId, String operationType, double amount) {
+        performOperation(walletId, operationType, amount);
+        return CompletableFuture.completedFuture(null);
+    }
     /**
      * Получает баланс кошелька по его идентификатору.
      *
@@ -44,7 +60,7 @@ public class WalletService {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
 
-        switch (operationType) {
+        switch (operationType.toUpperCase()) {
             case "WITHDRAW":
                 if (wallet.getBalance() < amount) {
                     throw new IllegalArgumentException("Not enough balance");
@@ -57,7 +73,6 @@ public class WalletService {
             default:
                 throw new IllegalArgumentException("Invalid operation type");
         }
-
         walletRepository.save(wallet);
     }
 }

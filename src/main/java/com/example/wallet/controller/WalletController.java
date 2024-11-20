@@ -5,10 +5,12 @@ import com.example.wallet.repository.WalletRepository;
 import com.example.wallet.service.WalletService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * REST-контроллер для управления кошельками.
@@ -49,19 +51,12 @@ public class WalletController {
      * @return статус выполнения операции
      */
     @PostMapping
-    public ResponseEntity<Map<String, Object>> performOperation(@RequestBody Map<String, Object> request) {
-        try {
-            UUID walletId = UUID.fromString((String) request.get("walletId"));
-            String operationType = (String) request.get("operationType");
-            double amount = Double.parseDouble(request.get("amount").toString());
+    public ResponseEntity<Void> performOperation(@RequestBody Map<String, Object> request) {
+        UUID walletId = UUID.fromString((String) request.get("walletId"));
+        String operationType = (String) request.get("operationType");
+        double amount = Double.parseDouble(request.get("amount").toString());
 
-            walletService.performOperation(walletId, operationType, amount);
-
-            return ResponseEntity.ok(Map.of("walletId", walletId, "operation", operationType, "amount", amount));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
-        }
+        walletService.performOperationAsync(walletId, operationType, amount);
+        return ResponseEntity.accepted().build(); // Сразу отправляем ответ
     }
 }

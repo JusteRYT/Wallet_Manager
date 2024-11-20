@@ -5,7 +5,7 @@ spring:
     password: wallet_password
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 100
+      maximum-pool-size: 30
       idle-timeout: 30000
       max-lifetime: 60000
   servlet:
@@ -20,3 +20,9 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
+server:
+  tomcat:
+    connection-timeout: 20000
+    threads:
+      max: 500
+    max-connections: 10000

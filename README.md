@@ -112,12 +112,12 @@ curl -X GET http://localhost:8080/api/v1/wallets/ab0af497-c5a0-45cb-9262-659048e
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
- server:
-  tomcat:
-    connection-timeout: 20000
-    threads:
-      max: 500
-    max-connections: 10000
+  server:
+     tomcat:
+       connection-timeout: 20000
+       threads:
+         max: 500
+        max-connections: 10000
   ```
 
   ## 🛡️ Обработка ошибок

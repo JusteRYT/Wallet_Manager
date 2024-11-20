@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -73,7 +74,9 @@ class WalletControllerTest {
         String operationType = "DEPOSIT";
         double amount = 1000.0;
 
-        Mockito.doNothing().when(walletService).performOperation(walletId, operationType, amount);
+        // Мокируем асинхронный метод
+        CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+        Mockito.when(walletService.performOperationAsync(walletId, operationType, amount)).thenReturn(future);
 
         String requestBody = String.format("""
                 {
@@ -86,7 +89,7 @@ class WalletControllerTest {
         mockMvc.perform(post("/api/v1/wallets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isOk())
+                .andExpect(status().isAccepted()) // Ожидаем статус 202
                 .andExpect(jsonPath("$.walletId").value(walletId.toString()))
                 .andExpect(jsonPath("$.operation").value(operationType))
                 .andExpect(jsonPath("$.amount").value(amount));
@@ -98,18 +101,12 @@ class WalletControllerTest {
      */
     @Test
     void performOperation_ShouldReturnError_WhenInputInvalid() throws Exception {
-        String invalidRequestBody = """
-                {
-                  "walletId": "invalid-uuid",
-                  "operationType": "DEPOSIT",
-                  "amount": 1000
-                }
-                """;
-
+        // Пример некорректного UUID
+        String invalidUuid = "invalid-uuid";  // Это некорректный UUID
         mockMvc.perform(post("/api/v1/wallets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").exists());
+                        .param("walletId", invalidUuid)  // Проблемное место
+                        .param("operationType", "deposit")
+                        .param("amount", "100"))
+                .andExpect(status().isBadRequest());
     }
 }

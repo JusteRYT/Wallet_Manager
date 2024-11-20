@@ -51,12 +51,18 @@ public class WalletController {
      * @return статус выполнения операции
      */
     @PostMapping
-    public ResponseEntity<Void> performOperation(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> performOperation(@RequestBody Map<String, Object> request) {
         UUID walletId = UUID.fromString((String) request.get("walletId"));
         String operationType = (String) request.get("operationType");
         double amount = Double.parseDouble(request.get("amount").toString());
 
         walletService.performOperationAsync(walletId, operationType, amount);
-        return ResponseEntity.accepted().build(); // Сразу отправляем ответ
+
+        // Возвращаем успешный ответ с данными
+        return ResponseEntity.accepted().body(Map.of(
+                "walletId", walletId.toString(),
+                "operation", operationType,
+                "amount", amount
+        ));
     }
 }

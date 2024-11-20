@@ -91,15 +91,33 @@ curl -X GET http://localhost:8080/api/v1/wallets/ab0af497-c5a0-45cb-9262-659048e
 
   ```yaml
   spring:
-    datasource:
-      url: jdbc:postgresql://localhost:5432/wallet_db
-      username: wallet_user
-      password: wallet_password
-    jpa:
-      hibernate:
-        ddl-auto: none
-    liquibase:
-      change-log: classpath:/db/changelog/db.changelog-master.yaml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wallet_db
+    username: wallet_user
+    password: wallet_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 30
+      idle-timeout: 30000
+      max-lifetime: 60000
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+ server:
+  tomcat:
+    connection-timeout: 20000
+    threads:
+      max: 500
+    max-connections: 10000
   ```
 
   ## 🛡️ Обработка ошибок
